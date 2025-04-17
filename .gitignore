@@ -13,7 +13,8 @@ docker-compose.override.yml
 *.swp
 
 # Ignore the jars and driver folder     
-jars/*
+jars/*.jar
+*.jar
 
 # Airflow files
 airflow.db
@@ -25,7 +26,9 @@ minio_data/
 # Postgres data 
 postgres_data/
 
+# Some Other File/Folder
 *.txt
+data-output
 
 .vscode/
 
