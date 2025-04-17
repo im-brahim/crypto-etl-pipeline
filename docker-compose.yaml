@@ -1,0 +1,111 @@
+services:
+
+  master:
+    image: bitnami/spark:3.5.0
+    container_name: master
+    hostname: master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_MEMORY=1g
+      - SPARK_EXTRA_CLASSPATH=/opt/spark/jars/*
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    networks:
+      - etl-network
+    volumes:
+      - ./jars:/opt/spark/jars
+      - ./jobs:/opt/spark/jobs
+      - ./data-output:/opt/spark/data
+      # - ./config/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+
+  worker:
+    image: bitnami/spark:3.5.0
+    container_name: worker
+    hostname: worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://master:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+    ports:
+      - "8082:8081"
+    depends_on:
+      - master
+    volumes:
+      - ./jobs:/opt/spark/jobs
+      - ./jars:/opt/spark/jars
+    networks:
+      - etl-network
+
+  jupyter:
+    image: jupyter/pyspark-notebook:x86_64-spark-3.5.0
+    container_name: jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./jars:/opt/spark/jars
+      - ./notebooks:/home/jovyan/work/notebooks
+      - ./data:/home/jovyan/work/data
+    command: >
+      start-notebook.sh --NotebookApp.token=''
+    networks:
+      - etl-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=00000000
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - etl-network
+
+  airflow:
+    image: apache/airflow:2.7.2-python3.9
+    container_name: airflow
+    ports:
+      - "8081:8080"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=OKX45Jr7vUpjKlmp0Y/Oj/sNGzshXOe17GrNMkDLQYE=
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=False
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./airflow-entrypoint.sh:/opt/airflow/airflow-entrypoint.sh
+      - ./airflow.db:/opt/airflow/airflow.db
+      - /var/run/docker.sock:/var/run/docker.sock   # To let Airflow use DockerOperator
+    networks:
+      - etl-network
+    command: bash -c "pip install requests boto3 && bash /opt/airflow/airflow-entrypoint.sh"
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - etl-network
+
+volumes:
+  minio_data:
+  postgres_data:
+
+networks:
+  etl-network:
+    driver: bridge

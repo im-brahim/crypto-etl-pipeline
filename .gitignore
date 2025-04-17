@@ -1,0 +1,32 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Docker-related files
+docker-compose.override.yml
+*.log
+*.bak
+*.swp
+
+# Ignore the jars and driver folder     
+jars/*
+
+# Airflow files
+airflow.db
+airflow-logs/
+
+# MinIO / S3 data 
+minio_data/
+
+# Postgres data 
+postgres_data/
+
+*.txt
+
+.vscode/
+
+

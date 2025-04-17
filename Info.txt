@@ -1,0 +1,13 @@
+# Create User in airflow:
+"""
+docker exec -it airflow bash
+
+airflow users create \
+   --username airflow \
+   --firstname Ibrahim \
+   --lastname User \
+   --role Admin \
+   --email ibrahim@example.com \
+   --password airflow
+
+"""
