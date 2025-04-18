@@ -1,3 +1,12 @@
+# Some Other File/Folder
+*.txt
+data-output
+
+.vscode/
+
+crypto_price_dag.py
+
+
 # Python bytecode files
 *.pyc
 *.pyo
@@ -27,11 +36,5 @@ minio_data/
 
 # Postgres data 
 postgres_data/
-
-# Some Other File/Folder
-*.txt
-data-output
-
-.vscode/
 
 
