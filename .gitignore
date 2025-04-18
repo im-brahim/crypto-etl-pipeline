@@ -13,8 +13,10 @@ docker-compose.override.yml
 *.swp
 
 # Ignore the jars and driver folder     
-jars/*.jar
+./jars/*.jar
 *.jar
+jars/
+
 
 # Airflow files
 airflow.db
