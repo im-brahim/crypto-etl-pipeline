@@ -13,8 +13,9 @@ Some_Code.py
 __pycache__/
 
 # Jupyter Notebooks checkpoints
+notebooks/*.ipynb
 .ipynb_checkpoints/
-notebooks/
+*.ipynb
 
 # Docker-related files
 docker-compose.override.yml

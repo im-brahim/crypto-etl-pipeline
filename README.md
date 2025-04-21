@@ -71,8 +71,8 @@ The save_to_db.py script saves the processed data to a PostgreSQL database for s
 ## How to Stop the Services
 To stop the services once you're done, run the following command: 
     
-    ```bash
-    docker-compose down
+      ```bash
+      docker-compose down
 
 ## Skills Practiced
 
