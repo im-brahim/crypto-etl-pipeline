@@ -19,7 +19,6 @@ spark = SparkSession.builder \
 print("-------------------------------- START JOB 3 --------------------------------")
 logger.info("Starting the Spark job...")
 
-
 # Step 1: Read from MinIO
 df = spark.read.parquet("s3a://crypto/processed/")
 df.show()

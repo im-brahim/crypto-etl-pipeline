@@ -16,7 +16,7 @@ services:
     volumes:
       - ./jars:/opt/spark/jars
       - ./jobs:/opt/spark/jobs
-      - ./data-output:/opt/spark/data
+      # - ./data-output:/opt/spark/data
       # - ./config/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
 
   worker:
