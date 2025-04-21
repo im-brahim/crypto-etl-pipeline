@@ -46,11 +46,12 @@ def fetch_and_save():
         print(f"Error: {e}")
 
 with DAG(
-    dag_id="crypto_price_hourly",
+    dag_id="ingest_crypto_price",
     default_args=default_args,
     start_date=datetime(2025, 4, 15),
-    schedule_interval='@hourly',         # every minute: '*/1 * * * *',       # every hour: '@hourly', 
-    catchup=False
+    schedule_interval='*/1 * * * *',         # every minute: '*/1 * * * *',       # every hour: '@hourly', 
+    catchup=False,
+    tags=["ingestion", "API_crypto", "MinIO"]
 ) as dag:
 
     task = PythonOperator(

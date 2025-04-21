@@ -3,9 +3,9 @@
 data-output
 
 .vscode/
-
+*.docx
 crypto_price_dag.py
-
+Some_Code.py
 
 # Python bytecode files
 *.pyc

@@ -1,53 +1,53 @@
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime, timedelta
+from docker.types import Mount
+from airflow.operators.bash import BashOperator
+
 
 default_args = {
     'owner': 'airflow',
-    'retries': 3,
-    'retry_delay': timedelta(minutes=5),
+    'retries': 1,
+    'retry_delay': timedelta(minutes=2),
 }
 
 with DAG(
-    dag_id="spark_etl_pipeline",
+    dag_id="spark_etl_from_minio_to_db",
     default_args=default_args,
+    description="ETL pipeline to process data from MinIO and load into PostgreSQL",
     start_date=datetime(2025, 4, 17),
-    schedule_interval='@hourly',  # Every hour
-    catchup=False
+    schedule_interval="@hourly",
+    catchup=False,
+    tags=["Spark", "ETL", "MinIO", "DB"]
 ) as dag:
 
-# Task 1: read_from_minio:
-read_from_minio = DockerOperator(
-    task_id='read_from_minio',
-    image='bitnami/spark:3.5.0',
-    command='spark-submit /opt/spark/jobs/read_crypto_from_minio.py',
-    docker_url='unix://var/run/docker.sock',
-    network_mode='etl-network',
-    volumes=['./jobs:/opt/spark/jobs'],
-    dag=dag
-)
+    #/opt/bitnami/spark/bin/
+    # # Task 1: Read JSON from MinIO
+    read_json = BashOperator(
+        task_id='read_json',
+        bash_command="""
+        docker exec master spark-submit --master spark://master:7077 /opt/spark/jobs/read_data_from_minio.py
+        """
+    )
 
-# Task 2: process_data
-process_data = DockerOperator(
-    task_id='process_data',
-    image='bitnami/spark:3.5.0',
-    command='spark-submit /opt/spark/jobs/process_crypto.py',
-    docker_url='unix://var/run/docker.sock',
-    network_mode='etl-network',
-    volumes=['./jobs:/opt/spark/jobs'],
-    dag=dag
-)
+    # Task 2: Process Data
+    process_data = BashOperator(
+        task_id='process_data',
+        bash_command="""
+        docker exec master /opt/bitnami/spark/bin/spark-submit \
+        --master spark://master:7077 /opt/spark/jobs/process_data.py
+        """
+    )
 
-# Task 3: save_to_db
-save_to_db = DockerOperator(
-    task_id='save_to_db',
-    image='bitnami/spark:3.5.0',
-    command='spark-submit /opt/spark/jobs/save_to_db.py',
-    docker_url='unix://var/run/docker.sock',
-    network_mode='etl-network',
-    volumes=['./jobs:/opt/spark/jobs'],
-    dag=dag
-)
+    # Task 3: Save to PostgreSQL
+    save_to_db = BashOperator(
+        task_id='save_to_db',
+        bash_command="""
+        docker exec master /opt/bitnami/spark/bin/spark-submit --master spark://master:7077 \
+        --jars /opt/spark/jars/postgresql-42.6.0.jar \
+        /opt/spark/jobs/save_to_db.py
+        """    
+    )
 
-# Task dependencies:
-read_from_minio >> process_data >> save_to_db
+    # Set task dependencies
+    read_json >> process_data >> save_to_db
