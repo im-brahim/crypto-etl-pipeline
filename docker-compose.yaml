@@ -38,20 +38,6 @@ services:
     networks:
       - etl-network
 
-  # jupyter:
-  #   image: jupyter/pyspark-notebook:x86_64-spark-3.5.0
-  #   container_name: jupyter
-  #   ports:
-  #     - "8888:8888"
-  #   volumes:
-  #     - ./jars:/opt/spark/jars
-  #     - ./notebooks:/home/jovyan/work/notebooks
-  #     - ./data:/home/jovyan/work/data
-  #   command: >
-  #     start-notebook.sh --NotebookApp.token=''
-  #   networks:
-  #     - etl-network
-
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -101,6 +87,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - etl-network
+
+  # jupyter:
+  #   image: jupyter/pyspark-notebook:x86_64-spark-3.5.0
+  #   container_name: jupyter
+  #   ports:
+  #     - "8888:8888"
+  #   volumes:
+  #     #- ./jars:/opt/spark/jars
+  #     - ./notebooks:/home/jovyan/work/notebooks
+  #     - ./data:/home/jovyan/work/data
+  #   command: >
+  #     start-notebook.sh --NotebookApp.token=''
+  #   networks:
+  #     - etl-network
 
 volumes:
   minio_data:

@@ -14,3 +14,4 @@ airflow users create \
 
 # To execute a scripte that need the driver for postgres use : 
    spark-submit --jars /opt/spark/jars/postgresql-42.6.0.jar /opt/spark/jobs/...
+

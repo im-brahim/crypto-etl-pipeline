@@ -1,6 +1,7 @@
 # Crypto ETL Pipeline with Airflow and Spark
 
-This project is an end-to-end **ETL pipeline** designed to fetch cryptocurrency prices from a public API, process the data using **Apache Spark**, and save the results to a **PostgreSQL** database, all orchestrated by **Apache Airflow**. Additionally, **Jupyter Notebooks** are used for interactive data exploration.
+This project is an end-to-end **ETL pipeline** designed to fetch cryptocurrency prices from a public API, process the data using **Apache Spark**, and save the results to a **PostgreSQL** database, all orchestrated by **Apache Airflow**.
+<!-- Additionally, **Jupyter Notebooks** are used for interactive data exploration. -->
 
 ## Architecture
 
@@ -8,7 +9,7 @@ This project is an end-to-end **ETL pipeline** designed to fetch cryptocurrency 
 - **Spark**: Used for processing the raw cryptocurrency data and saving it in a structured format.
 - **MinIO**: Acts as an S3-compatible storage solution for storing raw and processed data.
 - **PostgreSQL**: Data storage for processed cryptocurrency prices.
-- **Jupyter**: Provides an interactive environment for analyzing the data with Spark.
+<!-- - **Jupyter**: Provides an interactive environment for analyzing the data with Spark. -->
 
 ## Technologies
 
@@ -16,6 +17,7 @@ This project is an end-to-end **ETL pipeline** designed to fetch cryptocurrency 
 - Apache Spark
 - MinIO (S3 storage)
 - PostgreSQL
+<!-- - Jupyter -->
 - Docker
 
 ## How to Run Locally
@@ -37,13 +39,13 @@ This project is an end-to-end **ETL pipeline** designed to fetch cryptocurrency 
 
 - Spark Master UI at http://localhost:8080
 
-- Jupyter at http://localhost:8888
+<!-- - Jupyter at http://localhost:8888 -->
 
 4. The DAG files for Airflow are located in the /dags/ folder, where each DAG performs a specific ETL task.
 
 ### Notes:
 
-**Jupyter:** Jupyter notebooks are included in this setup to provide an interactive environment for exploring the processed data, running Spark jobs, and performing additional analysis. You can access Jupyter by navigating to http://localhost:8888.
+<!-- **Jupyter:** Jupyter notebooks are included in this setup to provide an interactive environment for exploring the processed data, running Spark jobs, and performing additional analysis. You can access Jupyter by navigating to http://localhost:8888. -->
 
 **Docker Compose:** The entire stack is managed using Docker Compose, which simplifies the process of running all services (Airflow, Spark, MinIO, PostgreSQL, and Jupyter) locally.
 
