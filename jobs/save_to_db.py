@@ -16,8 +16,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 #    .config("spark.jars", "/opt/spark/jars/postgresql-42.6.0.jar") \
  
-print("-------------------------------- START JOB 3 --------------------------------")
-logger.info("Starting the Spark job...")
+logger.info("-------------------------------- START JOB 3 --------------------------------")
 
 # Step 1: Read from MinIO
 df = spark.read.parquet("s3a://crypto/processed/")
@@ -42,7 +41,6 @@ try:
 
 except AnalysisException:
     print("Table not found. This might be first run.")
-    # Keep full df if table doesn't exist
 
 # Step 3: Save only new rows
 if df.count() > 0:
@@ -59,7 +57,6 @@ if df.count() > 0:
 else:
     print("🚫 No new data to write.")
 
-print("-------------------------------- JOB 3 is DONE --------------------------------")
-logger.info("Spark job completed successfully.")
+logger.info("-------------------------------- JOB 3 is DONE --------------------------------")
 
 spark.stop()

@@ -19,8 +19,6 @@ df = spark.read.json("s3a://crypto/crypto.json")
 df.printSchema()
 df.show(5)
 
-# Save it temporarily for debugging (optional)
-df.createOrReplaceTempView("raw_crypto")
 
 print("---------------------- JOB 1 Done  ----------------------------")
 
