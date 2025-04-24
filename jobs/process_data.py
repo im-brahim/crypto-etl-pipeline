@@ -11,7 +11,7 @@ spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
     .getOrCreate()
 
-print("--------------------- Starting data processing (JOB 2)... ----------------------------")
+print("--------------------- Starting data processing (JOB 2)... -------------------------------")
 
 # Load JSON from MinIO
 df = spark.read.json("s3a://crypto/crypto.json")
