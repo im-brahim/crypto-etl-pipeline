@@ -22,20 +22,24 @@ with DAG(
 ) as dag:
 
     #/opt/bitnami/spark/bin/
-    # # Task 1: Read JSON from MinIO
-    read_json = BashOperator(
-        task_id='read_json',
+    # # Task 1: Read JSON from MinIO & Process It
+    process_data = BashOperator(
+        task_id='read_process_json',
         bash_command="""
-        docker exec master spark-submit --master spark://master:7077 /opt/spark/jobs/read_data_from_minio.py
+            docker exec master spark-submit \
+            --master spark://master:7077 \
+            /opt/spark/jobs/process_data.py
         """
     )
 
-    # Task 2: Process Data
-    process_data = BashOperator(
-        task_id='process_data',
+    # Task 2: Compare Data
+    compare_data = BashOperator(
+        task_id='compare_data',
         bash_command="""
-        docker exec master /opt/bitnami/spark/bin/spark-submit \
-        --master spark://master:7077 /opt/spark/jobs/process_data.py
+            docker exec master spark-submit \
+            --master spark://master:7077 \
+            --jars /opt/spark/jars/postgresql-42.6.0.jar \
+            /opt/spark/jobs/compare_data.py
         """
     )
 
@@ -43,11 +47,12 @@ with DAG(
     save_to_db = BashOperator(
         task_id='save_to_db',
         bash_command="""
-        docker exec master /opt/bitnami/spark/bin/spark-submit --master spark://master:7077 \
-        --jars /opt/spark/jars/postgresql-42.6.0.jar \
-        /opt/spark/jobs/save_to_db.py
+            docker exec master /opt/bitnami/spark/bin/spark-submit \
+            --master spark://master:7077 \
+            --jars /opt/spark/jars/postgresql-42.6.0.jar \
+            /opt/spark/jobs/save_to_db.py
         """    
     )
 
     # Set task dependencies
-    read_json >> process_data >> save_to_db
+    process_data >> compare_data >> save_to_db

@@ -1,62 +1,28 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, to_timestamp
-import logging
+from connect import create_spark_session, get_logger
+from data_io import save_in_db , read_parquet_data, MINIO_NEW_PROCESSED_PATH
+from pyspark.sql.utils import AnalysisException
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+def main():
+    logger = get_logger("Save New to DB")
+    spark = create_spark_session("SaveNewToPostgres")
 
-# Initialize Spark session with PostgreSQL driver
-spark = SparkSession.builder \
-    .appName("SaveToPostgres") \
-    .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
-    .config("spark.hadoop.fs.s3a.access.key", "minio") \
-    .config("spark.hadoop.fs.s3a.secret.key", "00000000") \
-    .config("spark.hadoop.fs.s3a.path.style.access", "true") \
-    .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
-    .getOrCreate()
-#    .config("spark.jars", "/opt/spark/jars/postgresql-42.6.0.jar") \
- 
-logger.info("-------------------------------- START JOB 3 --------------------------------")
+    # Step 1: Read new_data from MinIO
+    try:
+        df_new = read_parquet_data(spark, MINIO_NEW_PROCESSED_PATH)
+        logger.info(f"📥 Read {df_new.count()} new rows from new_data/")
+    except AnalysisException as e:
+        logger.error("❌ Failed to read new_data: " + str(e))
+        spark.stop()
+        return
 
-# Step 1: Read from MinIO
-df = spark.read.parquet("s3a://crypto/processed/")
-df.show()
+    # Step 2: Save to PostgreSQL if data exists
+    if df_new.count() > 0:
+        save_in_db(df_new)
+        logger.info(f"✅ {df_new.count()} New rows saved to PostgreSQL.")
+    else:
+        logger.info("🚫 No new rows to insert.")
 
-# Step 2: Get latest timestamp from DB
-try:
-    db_df = spark.read \
-        .format("jdbc") \
-        .option("url", "jdbc:postgresql://postgres:5432/airflow") \
-        .option("dbtable", "crypto_prices") \
-        .option("user", "airflow") \
-        .option("password", "airflow") \
-        .option("driver", "org.postgresql.Driver") \
-        .load()
-    
-    max_ts = db_df.agg({"timestamp": "max"}).collect()[0][0]
+    spark.stop()
 
-    if max_ts:
-        print(f"Max timestamp in DB: {max_ts}")
-        df = df.filter(col("timestamp") > max_ts)
-
-except AnalysisException:
-    print("Table not found. This might be first run.")
-
-# Step 3: Save only new rows
-if df.count() > 0:
-    df.write \
-        .format("jdbc") \
-        .option("url", "jdbc:postgresql://postgres:5432/airflow") \
-        .option("dbtable", "crypto_prices") \
-        .option("user", "airflow") \
-        .option("password", "airflow") \
-        .option("driver", "org.postgresql.Driver") \
-        .mode("append") \
-        .save()
-    print("✅ New rows saved to DB.")
-else:
-    print("🚫 No new data to write.")
-
-logger.info("-------------------------------- JOB 3 is DONE --------------------------------")
-
-spark.stop()
+if __name__ == "__main__":
+    main()

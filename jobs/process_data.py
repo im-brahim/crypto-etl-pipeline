@@ -1,35 +1,38 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_unixtime
+from connect import create_spark_session, get_logger
+from data_io import read_json_data, save_parquet_data, MINIO_PROCESSED_PATH
+from pyspark.sql.functions import col
 
-# Initialize SparkSession with MinIO access
-spark = SparkSession.builder \
-    .appName("Process Crypto Data") \
-    .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000") \
-    .config("spark.hadoop.fs.s3a.access.key", "minio") \
-    .config("spark.hadoop.fs.s3a.secret.key", "00000000") \
-    .config("spark.hadoop.fs.s3a.path.style.access", "true") \
-    .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
-    .getOrCreate()
-
-print("--------------------- Starting data processing (JOB 2)... -------------------------------")
-
-# Load JSON from MinIO
-df = spark.read.json("s3a://crypto/crypto.json")
-
-# Flatten and clean the data
-flattened = df.select(
-    col("timestamp").cast("timestamp").alias("timestamp"),
-    col("bitcoin.usd").alias("bitcoin_usd"),
-    col("ethereum.usd").alias("ethereum_usd")
-)
-
-# Show sample
-flattened.show(5)
-flattened.printSchema()
+def process_data(df):
+    flattened = df.select(
+        col("timestamp").cast("timestamp").alias("timestamp"),
+        col("bitcoin.usd").alias("bitcoin_usd"),
+        col("ethereum.usd").alias("ethereum_usd")
+    )
+    return flattened
 
 
-flattened.write.mode("overwrite").parquet("s3a://crypto/processed/")
+def main():
+    # Initialize SparkSession with MinIO access
+    logger = get_logger("Process Data")
+    spark = create_spark_session("Extract and Process Crypto Data")
 
-print("--------------------- Data Processing Done ----------------------------")
+    # ----- Load JSON from MinIO ---------
+    df = read_json_data(spark)
 
-spark.stop()
+    # ----- Show schema and preview data ---------
+    # df.printSchema()
+    # df.show(5)
+
+    logger.info("--------------------- Starting data processing... -------------------------------")
+    
+    processed_data = process_data(df)
+    processed_data.show(5)
+
+    save_parquet_data(processed_data, MINIO_PROCESSED_PATH)       # Saving Again To MINIO
+    logger.info("--------------------- Data Processing & Saving Done ----------------------------")
+
+    spark.stop()
+
+
+if __name__ == "__main__":
+    main()

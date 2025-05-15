@@ -13,7 +13,8 @@ airflow users create \
 """
 
 # To execute a scripte that need the driver for postgres use : 
-   spark-submit --jars /opt/spark/jars/postgresql-42.6.0.jar /opt/spark/jobs/...
+   docker exec -it master \
+      spark-submit --jars /opt/spark/jars/postgresql-42.6.0.jar /opt/spark/jobs/...
 
 # The link of chat with chatGPT:
    https://chatgpt.com/share/68067c7d-9160-8004-a498-3e4edc111565
