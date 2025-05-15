@@ -1,15 +1,16 @@
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow import DAG # type: ignore
+from airflow.operators.python import PythonOperator # type: ignore
 from datetime import datetime, timedelta
-import requests, json, os
-import boto3
+import requests, json
+import boto3 # type: ignore
+from jobs.config import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_ENDPOINT
 
 def upload_to_minio(file_path, bucket_name, object_name):
     s3_client = boto3.client(
         's3',
-        endpoint_url='http://minio:9000',
-        aws_access_key_id='minio',
-        aws_secret_access_key='00000000',
+        endpoint_url= MINIO_ENDPOINT,
+        aws_access_key_id= MINIO_ACCESS_KEY,
+        aws_secret_access_key= MINIO_SECRET_KEY,
         region_name='us-east-1',
     )
     s3_client.upload_file(file_path, bucket_name, object_name)

@@ -1,8 +1,6 @@
-from airflow import DAG
-from airflow.providers.docker.operators.docker import DockerOperator
+from airflow import DAG # type: ignore
 from datetime import datetime, timedelta
-from docker.types import Mount
-from airflow.operators.bash import BashOperator
+from airflow.operators.bash import BashOperator # type: ignore
 
 
 default_args = {
