@@ -1,8 +1,8 @@
 import requests
 from datetime import datetime, timezone 
-from data_io import save_json_to_minio
-from connect import create_spark_session, get_logger
-from config import EXCHANGE_API_URL , EXCHANGE_RATE_PATH
+from jobs.data_io import save_json_to_minio
+from jobs.connect import create_spark_session, get_logger
+from jobs.config import EXCHANGE_API_URL , EXCHANGE_RATE_PATH
 
 logger = get_logger("Fetch Exchange Rate")
 spark = create_spark_session("FetchExchangeRate")
