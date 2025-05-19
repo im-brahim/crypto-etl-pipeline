@@ -29,5 +29,4 @@ jobs:
 
       - name: Run unit tests with pytest
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)  
-          pytest
+          PYTHONPATH=. pytest
