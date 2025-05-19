@@ -1,5 +1,8 @@
+scripts/
+
+
 # Some Other File/Folder
-*.txt
+Info.txt
 data-output
 
 .vscode/
