@@ -24,5 +24,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run basic test
-        run: echo "✅ Python and dependencies installed!"
+      - name: Run syntax check
+        run: python -m py_compile jobs/fetch_rate.py
+
+      - name: Run unit tests with pytest
+        run: pytest
