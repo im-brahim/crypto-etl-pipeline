@@ -22,6 +22,8 @@ def fetch_usd_mad():
         # date = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 
         return [{
+            "base": "USD",
+            "target": "MAD",
             "rate": usd_to_mad,
             "date": date
         }]
