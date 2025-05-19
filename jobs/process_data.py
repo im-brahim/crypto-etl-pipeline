@@ -1,6 +1,8 @@
 from connect import create_spark_session, get_logger
-from data_io import read_json_data, save_parquet_data, MINIO_PROCESSED_PATH
-from pyspark.sql.functions import col
+from data_io import read_json_from_minio, save_parquet_to_minio 
+from pyspark.sql.functions import col # type: ignore
+from config import MINIO_PARQUET_PATH , MINIO_JSON_PATH
+
 
 def process_data(df):
     flattened = df.select(
@@ -17,7 +19,7 @@ def main():
     spark = create_spark_session("Extract and Process Crypto Data")
 
     # ----- Load JSON from MinIO ---------
-    df = read_json_data(spark)
+    df = read_json_from_minio(spark, MINIO_JSON_PATH)
 
     # ----- Show schema and preview data ---------
     # df.printSchema()
@@ -26,9 +28,9 @@ def main():
     logger.info("--------------------- Starting data processing... -------------------------------")
     
     processed_data = process_data(df)
-    processed_data.show(5)
+    # processed_data.show(5)
 
-    save_parquet_data(processed_data, MINIO_PROCESSED_PATH)       # Saving Again To MINIO
+    save_parquet_to_minio(processed_data, MINIO_PARQUET_PATH)       # Saving Again To MINIO
     logger.info("--------------------- Data Processing & Saving Done ----------------------------")
 
     spark.stop()

@@ -18,6 +18,8 @@ services:
       - ./jobs:/opt/spark/jobs
       # - ./data-output:/opt/spark/data
       # - ./config/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+    # command: bash -c "pip install requests boto3"
+    # command: bash -c "pip install --user -r /opt/spark/jobs/requirements.txt && /opt/bitnami/scripts/spark/entrypoint.sh spark-shell"
 
   worker:
     image: bitnami/spark:3.5.0
@@ -37,6 +39,8 @@ services:
       - ./jars:/opt/spark/jars
     networks:
       - etl-network
+    # command: bash -c "pip install requests boto3"
+    # command: bash -c "pip install --user -r /opt/spark/jobs/requirements.txt && /opt/bitnami/scripts/spark/entrypoint.sh spark-shell"
 
   minio:
     image: minio/minio:latest
@@ -72,8 +76,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock   # To let Airflow use DockerOperator
     networks:
       - etl-network
-    command: bash -c "pip install requests boto3 && bash /opt/airflow/airflow-entrypoint.sh"
-
+    command: bash -c "pip install -r /opt/airflow/dags/requirements.txt && bash /opt/airflow/airflow-entrypoint.sh"
+              
   postgres:
     image: postgres:13
     container_name: postgres

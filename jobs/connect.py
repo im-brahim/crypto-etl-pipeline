@@ -1,6 +1,6 @@
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession # type: ignore
 import logging
-from config import *
+from jobs.config import *
 
 def get_logger(name):
     logging.basicConfig(level=logging.INFO)

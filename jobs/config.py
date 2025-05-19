@@ -13,8 +13,8 @@ S3A_IMPL = "org.apache.hadoop.fs.s3a.S3AFileSystem"
 # MINIO_JSON_BUCKET = "crypto"
 # MINIO_PROCESSED_BUCKET = "crypto"
 MINIO_JSON_PATH = "s3a://crypto/crypto.json"
-MINIO_PROCESSED_PATH = "s3a://crypto/processed/"
-MINIO_NEW_PROCESSED_PATH = "s3a://tmp/new_data/"
+MINIO_PARQUET_PATH = "s3a://crypto/processed/"
+MINIO_PROCESSED_PATH = "s3a://tmp/new_data/"
 
 # Database configuration
 DB_URL = "jdbc:postgresql://postgres:5432/airflow"
@@ -22,3 +22,7 @@ DB_TABLE = "crypto_prices"
 DB_USER = "airflow"
 DB_PASSWORD = "airflow"
 DB_DRIVER = "org.postgresql.Driver"
+
+# Acces Key for API 
+EXCHANGE_API_URL = "https://open.er-api.com/v6/latest/USD"
+EXCHANGE_RATE_PATH = "s3a://exchange/"

@@ -1,12 +1,15 @@
-from config import *
+from jobs.config import *
 
-def read_json_data(spark):
-    return spark.read.json(MINIO_JSON_PATH)
+def read_json_from_minio(spark, path):
+    return spark.read.json(path)
 
-def read_parquet_data(spark, path):
+def read_parquet_from_minio(spark, path):
     return spark.read.parquet(path)
 
-def save_parquet_data(data, path):
+def save_json_to_minio(data, path):
+    data.write.mode("overwrite").json(path)
+
+def save_parquet_to_minio(data, path):
     data.write.mode("overwrite").parquet(path)
 
 

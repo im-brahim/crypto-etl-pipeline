@@ -3,7 +3,10 @@ from airflow.operators.python import PythonOperator # type: ignore
 from datetime import datetime, timedelta
 import requests, json
 import boto3 # type: ignore
-from jobs.config import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_ENDPOINT
+
+MINIO_ACCESS_KEY = "minio"
+MINIO_ENDPOINT = "http://minio:9000"
+MINIO_SECRET_KEY = "00000000"
 
 def upload_to_minio(file_path, bucket_name, object_name):
     s3_client = boto3.client(
