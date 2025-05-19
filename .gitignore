@@ -4,6 +4,7 @@ scripts/
 # Some Other File/Folder
 Info.txt
 data-output
+*.json
 
 .vscode/
 *.docx
