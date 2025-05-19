@@ -28,4 +28,6 @@ jobs:
         run: python -m py_compile jobs/fetch_rate.py
 
       - name: Run unit tests with pytest
-        run: pytest
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)  
+          pytest
