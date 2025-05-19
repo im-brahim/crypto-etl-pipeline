@@ -5,6 +5,7 @@ scripts/
 Info.txt
 data-output
 *.json
+run.sh
 
 .vscode/
 *.docx
