@@ -13,7 +13,8 @@ S3A_IMPL = "org.apache.hadoop.fs.s3a.S3AFileSystem"
 # MINIO_JSON_BUCKET = "crypto"
 # MINIO_PROCESSED_BUCKET = "crypto"
 MINIO_JSON_PATH = "s3a://crypto/crypto.json"
-MINIO_PARQUET_PATH = "s3a://crypto/processed/"
+# MINIO_PARQUET_PATH = "s3a://crypto/processed/"
+MINIO_PARQUET_PATH = "s3a://crypto/parquet/"
 MINIO_PROCESSED_PATH = "s3a://tmp/new_data/"
 
 # Database configuration

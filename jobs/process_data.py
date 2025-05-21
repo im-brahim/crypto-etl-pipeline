@@ -52,6 +52,6 @@ try:
     save_parquet_to_minio(enriched_df, MINIO_PARQUET_PATH)       # Saving Again To MINIO
     logger.info("--------------------- Data Processing & Saving Done ----------------------------")
 except AnalysisException as e:
-    logger.info(f"Can't Save To DATABASE {e}")
+    logger.warning(f"Can't Save To DATABASE {e}")
 
 spark.stop()
