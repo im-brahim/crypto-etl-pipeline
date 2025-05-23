@@ -1,7 +1,7 @@
 from jobs.scripts.rate import get_rate
-from utils.config import EXCHANGE_API_URL
+from jobs.utils.config import EXCHANGE_API_URL
 
-def test_fetch_usd_mad():
+def test_fetch_rate():
     result = get_rate(EXCHANGE_API_URL)
     
     assert isinstance(result, dict)
