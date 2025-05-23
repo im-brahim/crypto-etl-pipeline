@@ -1,4 +1,4 @@
-from jobs.config import *
+from utils.config import *
 
 def read_json_from_minio(spark, path):
     return spark.read.json(path)
@@ -23,7 +23,7 @@ def read_from_db(spark):
         .option("driver", DB_DRIVER) \
         .load()
 
-def save_in_db(data):
+def save_in_db(data, DB_TABLE = DB_TABLE):
     data.write \
         .format("jdbc") \
         .option("url", DB_URL) \

@@ -1,6 +1,6 @@
 from airflow import DAG # type: ignore
-from datetime import datetime, timedelta
 from airflow.operators.bash import BashOperator # type: ignore
+from datetime import datetime, timedelta
 
 
 default_args = {
@@ -19,7 +19,6 @@ with DAG(
     tags=["Spark", "ETL", "MinIO", "DB"]
 ) as dag:
 
-    #/opt/bitnami/spark/bin/
     # # Task 1: Read JSON from MinIO & Process It
     process_data = BashOperator(
         task_id='read_and_process_data',
@@ -63,24 +62,4 @@ with DAG(
 
     # Set task dependencies
     process_data >> compare_data >> save_to_db
-    
-    
-    #                               --------------------------------------------------
-
-    #                                Try one of those the existing command not work
-    #        (and this because the the change in the scripts for the Github Actions test e.g: jobs.connect)
-    # 1:
-    # """ 
-    #   docker exec master bash -c \
-    #   "PYTHONPATH=/opt/spark \
-    #   spark-submit --master spark://master:7077 \
-    #   /opt/spark/jobs/process_data.py"
-    # """
-    # 2 :
-    # """
-    #   docker exec master bash -c \
-    #   "export PYTHONPATH=\$PYTHONPATH:/opt/spark \
-    #   && \
-    #   spark-submit --master spark://master:7077 \
-    #   /opt/spark/jobs/process_data.py"
-    # """
+    # process_data

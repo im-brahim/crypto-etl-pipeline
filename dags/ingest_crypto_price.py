@@ -4,6 +4,12 @@ from datetime import datetime, timedelta
 import requests, json
 import boto3 # type: ignore
 
+default_args = {
+    'owner': 'airflow',
+    'retries': 2,
+    'retry_delay': timedelta(minutes=1),
+}
+
 MINIO_ACCESS_KEY = "minio"
 MINIO_ENDPOINT = "http://minio:9000"
 MINIO_SECRET_KEY = "00000000"
@@ -18,11 +24,6 @@ def upload_to_minio(file_path, bucket_name, object_name):
     )
     s3_client.upload_file(file_path, bucket_name, object_name)
 
-default_args = {
-    'owner': 'airflow',
-    'retries': 2,
-    'retry_delay': timedelta(minutes=5),
-}
 
 def fetch_and_save():
     url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"

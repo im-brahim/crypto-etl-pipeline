@@ -16,6 +16,8 @@ services:
     volumes:
       - ./jars:/opt/spark/jars
       - ./jobs:/opt/spark/jobs
+      # - ./scripts:/opt/spark/scripts
+      # - ./utils:/opt/spark/utils
       # - ./data-output:/opt/spark/data
       # - ./config/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
     # command: bash -c "pip install requests boto3"
@@ -37,6 +39,8 @@ services:
     volumes:
       - ./jobs:/opt/spark/jobs
       - ./jars:/opt/spark/jars
+      # - ./scripts:/opt/spark/scripts
+      # - ./utils:/opt/spark/utils
     networks:
       - etl-network
     # command: bash -c "pip install requests boto3"
@@ -63,6 +67,7 @@ services:
     ports:
       - "8081:8080"
     environment:
+      # - PYTHONPATH=/opt/spark   # I add this line 
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__FERNET_KEY=OKX45Jr7vUpjKlmp0Y/Oj/sNGzshXOe17GrNMkDLQYE=
@@ -72,8 +77,8 @@ services:
       - ./dags:/opt/airflow/dags
       - ./data:/opt/airflow/data
       - ./airflow-entrypoint.sh:/opt/airflow/airflow-entrypoint.sh
-      - ./airflow.db:/opt/airflow/airflow.db
-      - /var/run/docker.sock:/var/run/docker.sock   # To let Airflow use DockerOperator
+      # - ./airflow.db:/opt/airflow/airflow.db
+      - /var/run/docker.sock:/var/run/docker.sock   
     networks:
       - etl-network
     command: bash -c "pip install -r /opt/airflow/dags/requirements.txt && bash /opt/airflow/airflow-entrypoint.sh"

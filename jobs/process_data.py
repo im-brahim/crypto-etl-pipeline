@@ -1,8 +1,8 @@
-from jobs.connect import create_spark_session, get_logger
-from jobs.data_io import read_json_from_minio, save_parquet_to_minio, read_parquet_from_minio
+from utils.connect import create_spark_session, get_logger
+from utils.data_io import read_json_from_minio, save_parquet_to_minio
 from pyspark.sql.functions import col, to_date, when
-from jobs.config import MINIO_PARQUET_PATH , MINIO_JSON_PATH, EXCHANGE_API_URL
-from jobs.scripts.rate import get_rate
+from utils.config import MINIO_PARQUET_PATH , MINIO_JSON_PATH, EXCHANGE_API_URL
+from scripts.rate import get_rate
 from pyspark.errors import AnalysisException
 
 # Initialize SparkSession with MinIO access

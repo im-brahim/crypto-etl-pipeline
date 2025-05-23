@@ -20,9 +20,13 @@ MINIO_PROCESSED_PATH = "s3a://tmp/new_data/"
 # Database configuration
 DB_URL = "jdbc:postgresql://postgres:5432/airflow"
 DB_TABLE = "crypto_prices"
+DB_TABLE_ENR = "crypto_prices_mad"
 DB_USER = "airflow"
 DB_PASSWORD = "airflow"
 DB_DRIVER = "org.postgresql.Driver"
+
+# Currency API:
+CURRENCY_API = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
 
 # Acces Key for API 
 EXCHANGE_API_URL = "https://open.er-api.com/v6/latest/USD"

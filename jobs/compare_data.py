@@ -1,6 +1,6 @@
-from connect import create_spark_session, get_logger
-from data_io import read_parquet_from_minio, read_from_db, save_parquet_to_minio
-from config import MINIO_PARQUET_PATH, MINIO_PROCESSED_PATH
+from utils.connect import create_spark_session, get_logger
+from utils.data_io import read_parquet_from_minio, read_from_db, save_parquet_to_minio
+from utils.config import MINIO_PARQUET_PATH, MINIO_PROCESSED_PATH
 from pyspark.sql.functions import col # type: ignore
 from pyspark.sql.utils import AnalysisException # type: ignore
 
