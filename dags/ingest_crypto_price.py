@@ -3,6 +3,10 @@ from airflow.operators.python import PythonOperator # type: ignore
 from datetime import datetime, timedelta
 import requests, json
 import boto3 # type: ignore
+from dotenv import load_dotenv # type: ignore
+import os
+
+load_dotenv()
 
 default_args = {
     'owner': 'airflow',
@@ -10,23 +14,23 @@ default_args = {
     'retry_delay': timedelta(minutes=1),
 }
 
-MINIO_ACCESS_KEY = "minio"
-MINIO_ENDPOINT = "http://minio:9000"
-MINIO_SECRET_KEY = "00000000"
+ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+ENDPOINT = os.getenv("MINIO_ENDPOINT")
+SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 
 def upload_to_minio(file_path, bucket_name, object_name):
     s3_client = boto3.client(
         's3',
-        endpoint_url= MINIO_ENDPOINT,
-        aws_access_key_id= MINIO_ACCESS_KEY,
-        aws_secret_access_key= MINIO_SECRET_KEY,
+        endpoint_url= ENDPOINT,
+        aws_access_key_id= ACCESS_KEY,
+        aws_secret_access_key= SECRET_KEY,
         region_name='us-east-1',
     )
     s3_client.upload_file(file_path, bucket_name, object_name)
 
 
 def fetch_and_save():
-    url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
+    url = os.getenv("CURRENCY_API")
     try:
         res = requests.get(url)
         data = res.json()
@@ -43,9 +47,11 @@ def fetch_and_save():
         file_path = "/opt/airflow/data/crypto.json"
         with open(file_path, "a") as f:
             f.write(json.dumps(data) + "\n")
-
-        # Upload to MinIO
-        upload_to_minio(file_path, "crypto", "crypto.json")
+        try:
+            # Upload to MinIO
+            upload_to_minio(file_path, "crypto", "crypto.json")
+        except Exception as e:
+            print(f"---------Not upload to Minio: {e}")
 
     except Exception as e:
         print(f"Error: {e}")

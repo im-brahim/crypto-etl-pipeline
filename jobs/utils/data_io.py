@@ -1,4 +1,7 @@
-from utils.config import *
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def read_json_from_minio(spark, path):
     return spark.read.json(path)
@@ -16,20 +19,20 @@ def save_parquet_to_minio(data, path):
 def read_from_db(spark):
     return spark.read \
         .format("jdbc") \
-        .option("url", DB_URL) \
-        .option("dbtable", DB_TABLE) \
-        .option("user", DB_USER) \
-        .option("password", DB_PASSWORD) \
-        .option("driver", DB_DRIVER) \
+        .option("url", os.getenv("DB_URL")) \
+        .option("dbtable", os.getenv("DB_TABLE")) \
+        .option("user", os.getenv("DB_USER")) \
+        .option("password", os.getenv("DB_PASSWORD")) \
+        .option("driver", os.getenv("DB_DRIVER")) \
         .load()
 
-def save_in_db(data, DB_TABLE = DB_TABLE):
+def save_in_db(data, DB_TABLE):
     data.write \
         .format("jdbc") \
-        .option("url", DB_URL) \
+        .option("url", os.getenv("DB_URL")) \
         .option("dbtable", DB_TABLE) \
-        .option("user", DB_USER) \
-        .option("password", DB_PASSWORD) \
-        .option("driver", DB_DRIVER) \
+        .option("user", os.getenv("DB_USER")) \
+        .option("password", os.getenv("DB_PASSWORD")) \
+        .option("driver", os.getenv("DB_DRIVER")) \
         .mode("append") \
         .save()

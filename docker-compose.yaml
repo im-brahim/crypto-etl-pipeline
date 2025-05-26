@@ -1,30 +1,32 @@
 services:
 
   master:
-    image: bitnami/spark:3.5.0
+    build:
+        context: .
+        dockerfile: Dockerfile   
+    image: my-spark:custom
     container_name: master
     hostname: master
     environment:
       - SPARK_MODE=master
       - SPARK_MASTER_MEMORY=1g
       - SPARK_EXTRA_CLASSPATH=/opt/spark/jars/*
+    env_file:
+      - .env
     ports:
       - "8080:8080"
       - "7077:7077"
     networks:
       - etl-network
     volumes:
-      - ./jars:/opt/spark/jars
+      # - ./jars:/opt/spark/jars
       - ./jobs:/opt/spark/jobs
-      # - ./scripts:/opt/spark/scripts
-      # - ./utils:/opt/spark/utils
-      # - ./data-output:/opt/spark/data
-      # - ./config/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
-    # command: bash -c "pip install requests boto3"
-    # command: bash -c "pip install --user -r /opt/spark/jobs/requirements.txt && /opt/bitnami/scripts/spark/entrypoint.sh spark-shell"
 
   worker:
-    image: bitnami/spark:3.5.0
+    build:
+        context: .
+        dockerfile: Dockerfile   
+    image: my-spark:custom
     container_name: worker
     hostname: worker
     environment:
@@ -32,26 +34,26 @@ services:
       - SPARK_MASTER_URL=spark://master:7077
       - SPARK_WORKER_MEMORY=1G
       - SPARK_WORKER_CORES=1
+    env_file:
+      - .env
     ports:
       - "8082:8081"
     depends_on:
       - master
     volumes:
       - ./jobs:/opt/spark/jobs
-      - ./jars:/opt/spark/jars
-      # - ./scripts:/opt/spark/scripts
-      # - ./utils:/opt/spark/utils
+      # - ./jars:/opt/spark/jars
     networks:
       - etl-network
-    # command: bash -c "pip install requests boto3"
-    # command: bash -c "pip install --user -r /opt/spark/jobs/requirements.txt && /opt/bitnami/scripts/spark/entrypoint.sh spark-shell"
 
   minio:
     image: minio/minio:latest
     container_name: minio
+    env_file:
+      - .env
     environment:
-      - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=00000000
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -66,8 +68,9 @@ services:
     container_name: airflow
     ports:
       - "8081:8080"
+    env_file:
+      - .env
     environment:
-      # - PYTHONPATH=/opt/spark   # I add this line 
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__FERNET_KEY=OKX45Jr7vUpjKlmp0Y/Oj/sNGzshXOe17GrNMkDLQYE=
@@ -76,8 +79,8 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./data:/opt/airflow/data
+      - ./airflow.db:/opt/airflow/airflow.db
       - ./airflow-entrypoint.sh:/opt/airflow/airflow-entrypoint.sh
-      # - ./airflow.db:/opt/airflow/airflow.db
       - /var/run/docker.sock:/var/run/docker.sock   
     networks:
       - etl-network
@@ -97,19 +100,6 @@ services:
     networks:
       - etl-network
 
-  # jupyter:
-  #   image: jupyter/pyspark-notebook:x86_64-spark-3.5.0
-  #   container_name: jupyter
-  #   ports:
-  #     - "8888:8888"
-  #   volumes:
-  #     #- ./jars:/opt/spark/jars
-  #     - ./notebooks:/home/jovyan/work/notebooks
-  #     - ./data:/home/jovyan/work/data
-  #   command: >
-  #     start-notebook.sh --NotebookApp.token=''
-  #   networks:
-  #     - etl-network
 
 volumes:
   minio_data:

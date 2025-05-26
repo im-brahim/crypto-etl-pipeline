@@ -1,15 +1,18 @@
 from utils.connect import create_spark_session, get_logger
 from utils.data_io import read_parquet_from_minio, read_from_db, save_parquet_to_minio
-from utils.config import MINIO_PARQUET_PATH, MINIO_PROCESSED_PATH
 from pyspark.sql.functions import col # type: ignore
 from pyspark.sql.utils import AnalysisException # type: ignore
+from dotenv import load_dotenv #type:ignore
+import os
+
+load_dotenv()
 
 def main():
     logger = get_logger("Compare New Data")
     spark = create_spark_session("CompareNewData")
 
     # Step 1: Read processed Parquet from MinIO
-    df_parquet = read_parquet_from_minio(spark, MINIO_PARQUET_PATH)
+    df_parquet = read_parquet_from_minio(spark, os.getenv("MINIO_PARQUET_PATH"))
     logger.info(f"📦 Read {df_parquet.count()} rows from Parquet")
 
     # Step 2: Try to read DB table and get max timestamp
@@ -24,10 +27,12 @@ def main():
         logger.info("⚠️ No existing table. Using all rows.")
         df_new = df_parquet
 
-    # Step 4: Save new rows to new-data path
+    # Step 4: Save new rows to processed path
     if df_new.count() > 0:
-        save_parquet_to_minio(df_new, MINIO_PROCESSED_PATH)
-        logger.info(f"✅ Saved {df_new.count()} new rows to tmp/new_data/ in MINIO")
+        path =  os.getenv("MINIO_PROCESSED_PATH")
+        # print(f"----------------{path}")
+        save_parquet_to_minio(df_new, path)
+        logger.info(f"✅ Saved {df_new.count()} new rows to processed/ in MINIO")
     else:
         logger.info("🚫 No new data to save.")
 

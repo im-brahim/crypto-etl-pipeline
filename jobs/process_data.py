@@ -1,35 +1,49 @@
 from utils.connect import create_spark_session, get_logger
-from utils.data_io import read_json_from_minio, save_parquet_to_minio
+from utils.data_io import read_json_from_minio, save_parquet_to_minio, save_in_db
 from pyspark.sql.functions import col, to_date, when
-from utils.config import MINIO_PARQUET_PATH , MINIO_JSON_PATH, EXCHANGE_API_URL
 from scripts.rate import get_rate
 from pyspark.errors import AnalysisException
+from dotenv import load_dotenv #type:ignore
+import os
+
+load_dotenv()
 
 # Initialize SparkSession with MinIO access
 logger = get_logger("Process Data")
-spark = create_spark_session("Extract and Process Crypto Data")
+spark = create_spark_session("Extract and Process Crypto Data", True)
 
 #                      ---------------------------------------------------
 # ----- Load Currency from MinIO & Get Rate Price USD/MAD ---------
-df = read_json_from_minio(spark, MINIO_JSON_PATH) 
-
-try:
-    rate = get_rate(EXCHANGE_API_URL)
-    rate_date = rate["datetime"][:10]   #.split(" ")[0]      # e.g. "2025-05-21" without time and zone
-    rate_value = rate["rate"]
-except:
-    logger.info("Can't Fetch Rate")
-    spark.stop()
-
-logger.info("---------------------Starting the Data Processing ----------------------------")
+json_path = os.getenv("MINIO_JSON_PATH")
+df = read_json_from_minio(spark, json_path) 
 
 flattened_df = df.select(
     col("timestamp").cast("timestamp").alias("timestamp"),
     col("bitcoin.usd").alias("BTC_usd"),
     col("ethereum.usd").alias("ETH_usd")
 )
+#                   --------------------------- To Save To DB : -------------------------
+# try:
+#     save_in_db(flattened_df, DB_TABLE = os.getenv("DB_TABLE"))    # also save to DataBase
+#     logger.info("------------- Saving To Database Done -----------")
+# except AnalysisException as e:
+#     logger.info(f"Can't save to Database {e}")
+
+
+
+logger.info("---------------------Starting the Data Processing ----------------------------")
+
+try:
+    exch_api = os.getenv("EXCHANGE_API_URL")
+    rate = get_rate(exch_api)
+    rate_date = rate["datetime"][:10]   #.split(" ")[0]      # e.g. "2025-05-21" without time and zone
+    rate_value = rate["rate"]
+except:
+    logger.info("Can't Fetch Rate")
+    spark.stop()
 
 # Apply Exchange Rate only if date matches
+
 enriched_df = flattened_df.withColumn(
     "RATE",
     when(to_date(col("timestamp")) == rate_date, rate_value)
@@ -44,12 +58,13 @@ enriched_df = flattened_df.withColumn(
     when(to_date(col("timestamp")) == rate_date, rate_date)
 )
 
-enriched_df.filter(to_date(col("timestamp")) == rate_date).show()
-# enriched_df.show()
+# enriched_df.filter(to_date(col("timestamp")) == rate_date).show()
+enriched_df.show()
 
 # Save all the Data to MINIO
 try:
-    save_parquet_to_minio(enriched_df, MINIO_PARQUET_PATH)       # Saving Again To MINIO
+    parquet_path = os.getenv("MINIO_PARQUET_PATH")
+    save_parquet_to_minio(enriched_df, parquet_path)       # Saving Again To MINIO
     logger.info("--------------------- Data Processing & Saving Done ----------------------------")
 except AnalysisException as e:
     logger.warning(f"Can't Save To DATABASE {e}")

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 default_args = {
     'owner': 'airflow',
     'retries': 1,
-    'retry_delay': timedelta(minutes=2),
+    'retry_delay': timedelta(minutes=1),
 }
 
 with DAG(
@@ -25,8 +25,7 @@ with DAG(
         bash_command=
             """
                 docker exec master bash -c \
-                "PYTHONPATH=/opt/spark \
-                spark-submit --master spark://master:7077 \
+                "spark-submit --master spark://master:7077 \
                 /opt/spark/jobs/process_data.py"
             """
     )
@@ -39,9 +38,7 @@ with DAG(
         bash_command=
             """
                 docker exec master bash -c \
-                "PYTHONPATH=/opt/spark \
-                spark-submit --master spark://master:7077 \
-                --jars /opt/spark/jars/postgresql-42.6.0.jar \
+                "spark-submit --master spark://master:7077 \
                 /opt/spark/jobs/compare_data.py"
             """
     )
@@ -53,9 +50,7 @@ with DAG(
         task_id='save_to_db',
         bash_command="""
             docker exec master bash -c \
-            "PYTHONPATH=/opt/spark
-            spark-submit --master spark://master:7077 \
-            --jars /opt/spark/jars/postgresql-42.6.0.jar \
+            "spark-submit --master spark://master:7077 \
             /opt/spark/jobs/save_to_db.py"
         """    
     )

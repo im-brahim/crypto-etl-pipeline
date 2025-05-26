@@ -1,8 +1,11 @@
+venv/
+
 # Some Other File/Folder
 Info.txt
 data-output
 *.json
 run.sh
+.env
 
 .vscode/
 *.docx

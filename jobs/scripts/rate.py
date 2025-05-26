@@ -1,5 +1,5 @@
-import sys
-sys.path.append("/opt/spark")
+# import sys
+# sys.path.append("/opt/spark")
 import requests
 from datetime import datetime
 

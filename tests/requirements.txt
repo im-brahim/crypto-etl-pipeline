@@ -1,4 +1,0 @@
-requests
-boto3
-pyspark==3.5.0
-pytest
