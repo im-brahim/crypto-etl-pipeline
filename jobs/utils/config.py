@@ -1,32 +1,20 @@
-# Spark configuration parameters
-SPARK_MASTER = "spark://master:7077"
-SPARK_APP_NAME = "Crypto ETL Pipeline"
+# config.py — safe to commit to GitHub
+import os
+from dotenv import load_dotenv  # type: ignore
 
-# MinIO connection parameters for Spark
-MINIO_ENDPOINT = "http://minio:9000"
-MINIO_ACCESS_KEY = "minio"
-MINIO_SECRET_KEY = "00000000"
-PATH_STYLE_ACCESS = "true"
-S3A_IMPL = "org.apache.hadoop.fs.s3a.S3AFileSystem"
+load_dotenv()
 
-# MinIO storage configuration
-# MINIO_JSON_BUCKET = "crypto"
-# MINIO_PROCESSED_BUCKET = "crypto"
-MINIO_JSON_PATH = "s3a://crypto/crypto.json"
-MINIO_PARQUET_PATH = "s3a://crypto/parquet/"
-MINIO_PROCESSED_PATH = "s3a://processed/parquet/"
+# Spark
+SPARK_MASTER = os.getenv("SPARK_MASTER", "spark://master:7077")
+SPARK_APP_NAME = os.getenv("SPARK_APP_NAME", "Crypto ETL Pipeline")
 
-# Database configuration
-DB_URL = "jdbc:postgresql://postgres:5432/airflow"
-DB_TABLE = "crypto_prices"
-DB_TABLE_ENR = "crypto_prices_mad"
-DB_USER = "airflow"
-DB_PASSWORD = "airflow"
-DB_DRIVER = "org.postgresql.Driver"
+# MinIO
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "http://minio:9000")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "minio")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")  # No default — must be in .env
 
-# Currency API:
-CURRENCY_API = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
-
-# Acces Key for API 
-EXCHANGE_API_URL = "https://open.er-api.com/v6/latest/USD"
-EXCHANGE_RATE_PATH = "s3a://exchange/"
+# Database
+DB_URL = os.getenv("DB_URL", "jdbc:postgresql://postgres:5432/airflow")
+DB_USER = os.getenv("DB_USER", "airflow")
+DB_PASSWORD = os.getenv("DB_PASSWORD")  # No default — must be in .env
+DB_DRIVER = "org.postgresql.Driver"     # Not a secret, hardcode is fine
