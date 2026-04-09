@@ -6,6 +6,7 @@ data-output
 *.json
 run.sh
 .env
+airflow-entrypoint.sh
 
 .vscode/
 *.docx
