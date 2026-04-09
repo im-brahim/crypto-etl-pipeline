@@ -23,8 +23,8 @@ def main():
 
         # Step 3: Filter new rows
         df_new = df_parquet.filter(col("timestamp") > max_ts)
-    except AnalysisException:
-        logger.info("⚠️ No existing table. Using all rows.")
+    except AnalysisException as e:
+        logger.info(f"⚠️ No existing table. Using all rows. {e}")
         df_new = df_parquet
 
     # Step 4: Save new rows to processed path
