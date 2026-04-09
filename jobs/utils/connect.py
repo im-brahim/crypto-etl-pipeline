@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession # type: ignore
 import logging
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # type: ignore
 import os
 
 load_dotenv()
