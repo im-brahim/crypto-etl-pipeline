@@ -16,7 +16,7 @@ TRAFFIC_LOCAL_PATH = os.getenv("TRAFFIC_LOCAL_PATH", "/opt/airflow/data/traffic/
 WEATHER_LOCAL_PATH = os.getenv("WEATHER_LOCAL_PATH", "/opt/airflow/data/weather/casablanca.json")
 
 
-def upload_to_minio(file_path: str, bucket_name: str, object_name: str) -> None:
+def upload_to_minio(file_path: str, bucket_name: str, object_name: str, logger) -> None:
     '''Uploads a file to MinIO using boto3.
     Args:
         file_path: Local path to the file to be uploaded.
@@ -36,7 +36,7 @@ def upload_to_minio(file_path: str, bucket_name: str, object_name: str) -> None:
     try:
         s3_client.upload_file(file_path, bucket_name, object_name)
     except Exception as e:
-        print(f"Error uploading file to MinIO: {e}")
+        logger.error(f"Error uploading file to MinIO: {e}", exc_info=True)
 
 def append_json_line(file_path: str, data: dict) -> None:
     '''
@@ -46,5 +46,6 @@ def append_json_line(file_path: str, data: dict) -> None:
         file_path: Local path to the file where the JSON line will be appended.
         data: Dictionary to be appended as a JSON line.
     '''
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)  # Ensure the directory exists
     with open(file_path, "a") as f:
         f.write(json.dumps(data) + "\n")    
