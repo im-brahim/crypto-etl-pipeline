@@ -35,7 +35,7 @@ def fetch_and_save():
 
         try:
             # Upload to MinIO
-            upload_to_minio(file_path, "weather", "casablanca.json")
+            upload_to_minio(file_path, "weather", "casablanca.json", logger)
         except Exception as e:
             logger.error(f"---------Not upload to Minio: {e}", exc_info=True)
 
