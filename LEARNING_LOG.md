@@ -8,7 +8,7 @@
 
 # 📚 LESSONS
 
-## Session 1 — April 9, 2026
+# Session 1 — April 9, 2026
 
 ### Lesson 1: Never use bare `except:`
 **What I had:**
@@ -123,9 +123,106 @@ if row_count > 0:
 
 ---
 
+
+# 🔮 SESSION 2 — April 10, 2026
+
+### Lesson 7: PEP8 Import Ordering
+**Rule:** Always order imports in 3 groups:
+1. Standard library (os, json, logging, datetime)
+2. Third party (requests, boto3, pyspark, airflow)
+3. Local imports (from utils import ...)
+
+Within each group — alphabetical order.
+Every professional Python linter enforces this automatically.
+
+---
+
+### Lesson 8: os.makedirs — always create directory before writing
+**Problem:** open(file_path, "a") crashes if directory doesn't exist.
+**Fix:**
+```python
+os.makedirs(os.path.dirname(file_path), exist_ok=True)
+```
+`exist_ok=True` means: create if missing, do nothing if exists.
+**Rule:** Always call this before writing any file. Never assume
+the directory exists.
+
+---
+
+### Lesson 9: Fail Slow Validation Pattern
+**Problem:** Returning on first failure hides other problems.
+```python
+# ❌ Fail fast — stops at first error, hides the rest
+for column in columns:
+    if has_nulls(column):
+        return False   # columns 2 and 3 never checked
+
+# ✅ Fail slow — checks everything, reports all problems
+is_valid = True
+for column in columns:
+    if has_nulls(column):
+        logger.warning(f"Column {column} has nulls")
+        is_valid = False   # continue checking
+return is_valid
+```
+**Rule:** In data validation, always check ALL conditions
+before returning. You want to see every problem at once,
+not discover them one by one across multiple pipeline runs.
+
+**Real tool that uses this pattern:** Great Expectations
+→ research this library, it's the industry standard for
+data quality in Python pipelines.
+
+---
+
+### Lesson 10: DRY — Don't Repeat Yourself
+**Problem:** Same function copy-pasted in 3 DAG files.
+**Fix:** Move shared functions to a utils module and import.
+
+**In our project:**
+- upload_to_minio() → moved to dags/utils.py
+- append_json_line() → moved to dags/utils.py
+- get_logger() → moved to dags/utils.py
+
+**Rule:** If you write the same code twice — it belongs
+in a shared module. The third time you copy it,
+you've already made a mistake.
+
+---
+
+### Lesson 11: Singleton Pattern
+**What it is:** Create an expensive object ONCE, reuse it
+instead of recreating on every function call.
+
+```python
+# ❌ Creates new connection every call — wasteful
+def upload_to_minio(file_path, bucket, object_name):
+    client = boto3.client('s3', ...)  # new connection every time
+    client.upload_file(...)
+
+# ✅ Singleton — creates connection only first time
+_s3_client = None
+
+def get_s3_client():
+    global _s3_client
+    if _s3_client is None:
+        _s3_client = boto3.client('s3', ...)
+    return _s3_client
+
+def upload_to_minio(file_path, bucket, object_name):
+    client = get_s3_client()  # reuses existing connection
+    client.upload_file(...)
+```
+**When it matters:** High frequency calls (every second/minute).
+For hourly pipelines — acceptable to skip.
+**Common candidates:** Database connections, API clients,
+Spark sessions, boto3 clients.
+
+---
+
 # 🗂️ GIT REFERENCE
 
-### Conventional Commits
+## Conventional Commits
 ```bash
 feat:      new feature
 fix:       bug fix
@@ -138,12 +235,12 @@ security:  security fix
 git commit -m "feat: add data validation module"
 ```
 
-### Branch Strategy
+## Branch Strategy
 
 main  → production only, never commit directly here
 dev   → daily work, merge to main when feature is complete
 
-### Useful Commands
+## Useful Commands:
 ```bash
 # History
 git log --oneline -10
@@ -172,18 +269,4 @@ git rm --cached filename
 
 ---
 
-# 🔮 SESSION 2 — Pre-work Notes
 
-### Data Quality Questions to Think About:
-1. What if Bitcoin price comes back as `0.0`?
-   → Need validation: reject prices outside realistic range
-
-2. What if the same timestamp is inserted twice?
-   → Database UNIQUE constraint on timestamp column
-   → `compare_data.py` filters by max timestamp but 
-      can't protect against race conditions
-
-3. What if `rate_value` is `None`?
-   → Spark stores `null` silently — no error, no warning
-   → BTC_MAD and ETH_MAD become null, data is corrupted
-   → Need null check before applying calculations
