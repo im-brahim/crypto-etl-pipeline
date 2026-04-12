@@ -1,5 +1,7 @@
 import os
+
 from dotenv import load_dotenv  # type: ignore
+from pyspark.errors import AnalysisException
 
 load_dotenv()
 
@@ -52,7 +54,7 @@ def save_parquet_to_minio(data: "DataFrame", path: str) -> None:
         path: S3A destination path (e.g. s3a://bucket/folder/)
     """
     data.write.mode("overwrite").parquet(path)
-
+     
 
 def read_from_db(spark: "SparkSession") -> "DataFrame":
     """

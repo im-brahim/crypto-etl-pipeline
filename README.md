@@ -1,4 +1,4 @@
-# 🔁 End-to-End ETL Pipeline with Spark, Airflow, MinIO & PostgreSQL
+# End-to-End ETL Pipeline with Spark, Airflow, MinIO & PostgreSQL
 
 This project is a complete local ETL (Extract, Transform, Load) pipeline designed to simulate a production-like data engineering environment using Docker Compose.
 
@@ -6,7 +6,7 @@ The pipeline fetches live cryptocurrency data from an API, processes it using Ap
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **Apache Spark 3.5.0** – For distributed data processing
 - **Apache Airflow 2.7.2** – For DAG orchestration
@@ -17,16 +17,16 @@ The pipeline fetches live cryptocurrency data from an API, processes it using Ap
 
 ---
 
-## ⚙️ Features
+## Features
 
-- 🌐 Fetches crypto price data from a public API
-- 🔄 Runs ETL jobs on a schedule using Airflow
-- 🚀 Spark reads from MinIO and writes to PostgreSQL
-- 🐳 Fully containerized for portability
+- Fetches crypto price data from a public API
+- Runs ETL jobs on a schedule using Airflow
+- Spark reads from MinIO and writes to PostgreSQL
+- Fully containerized for portability
 
 ---
 
-## 🚀 Getting Started
+## *To show this work follow the steps below*:
 
 ### 1. Clone the repo
     
@@ -45,7 +45,7 @@ The pipeline fetches live cryptocurrency data from an API, processes it using Ap
 
 - Enable and trigger the DAG spark_etl_pipeline
 
-## 📂 Project Structure
+## Project Structure
 
     .
     ├── dags/                  # Airflow DAGs
@@ -55,7 +55,7 @@ The pipeline fetches live cryptocurrency data from an API, processes it using Ap
     ├── docker-compose.yml     # Service orchestration
     └── README.md 
 
-### 🚫 !!!Important Notes on jars Folder and Drivers!!!
+### ***Important Notes on jars Folder and Drivers!***
 
 The jars folder contains essential drivers for integration with PostgreSQL and MinIO. Specifically:
 
@@ -65,11 +65,11 @@ The jars folder contains essential drivers for integration with PostgreSQL and M
 
 These files are not included in the repository due to size constraints. Please download the following versions and place them in the jars/ folder.
 
-## 💡 Notes
+## Notes
 
 This project was developed for practice purposes to simulate an end-to-end ETL workflow. The analysis part was tested separately but is not included in this repo.
 
-### 🤝 AI Collaboration
+### AI Collaboration
 
 Built with the help of AI (ChatGPT) for coding assistant 👨‍🏫
 - I used ChatGPT to:
@@ -79,7 +79,7 @@ Built with the help of AI (ChatGPT) for coding assistant 👨‍🏫
 
 ---
 
-### 🧩 Why I Did This
+### Why I Did This
 
 - To simulate a **real-world data pipeline**
 - To gain hands-on practice with:
@@ -90,7 +90,7 @@ Built with the help of AI (ChatGPT) for coding assistant 👨‍🏫
   - PostgreSQL
   - Python & ETL scripting
 
-### 🛠️ What I Built
+### What I Built
 
 - A full pipeline that:
   - Fetches crypto data from an API
@@ -99,12 +99,3 @@ Built with the help of AI (ChatGPT) for coding assistant 👨‍🏫
   - Loads it into a PostgreSQL database
   - Is orchestrated end-to-end with Airflow
 
-### 🧠 What I Learned
-
-- How to set up a **modular Spark cluster** in Docker
-- How to build **reliable Airflow DAGs**
-- How to manage **volumes and file paths** in containerized systems
-- How to debug common issues (JDBC, BashOperator vs DockerOperator, file mounts)
-- How to think like a **data engineer** when building pipelines
-
-_This was more than just coding — it was a deep learning experience._ 🚀
