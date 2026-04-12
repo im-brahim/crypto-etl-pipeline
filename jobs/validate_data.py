@@ -94,16 +94,19 @@ def run_validation(df: DataFrame, source: str) -> bool:
 
     # Step 1 — define rules based on source
     if source == "weather":
-        critical_columns = ['timestamp','temp', 'main']
+        critical_columns = ['timestamp', 'main.temp', 'main.humidity']
         min_val = -2
         max_val = 48
 
     elif source == "traffic":
-        critical_columns = ['timestamp','currentSpeed', 'confidence', 'freeFlowSpeed', 'currentTravelTime', 'freeFlowTravelTime']
-        min_val = 0
-        max_val = 103
+        critical_columns = ['timestamp',
+                            'flowSegmentData.currentSpeed',
+                            'flowSegmentData.confidence'
+                        ]
+        min_speed = 0.0
+        max_speed = 130.0
         min_confidence = 0.5
-        max_confidence = 1
+        max_confidence = 1.0
     else:
         logger.warning(f"Unknown Source '{source}'")
         return False   
@@ -118,13 +121,13 @@ def run_validation(df: DataFrame, source: str) -> bool:
         is_valid = False
     # Step 4 — check realistic values
     if source == "weather":
-        if not validate_realistic_values(df, 'temp',  min_val , max_val):
+        if not validate_realistic_values(df, 'main.temp',  min_val , max_val):
             is_valid = False 
     else:
         # Traffic
-        if not validate_realistic_values(df, 'currentSpeed',  min_val , max_val):
+        if not validate_realistic_values(df, 'flowSegmentData.currentSpeed',  min_speed , max_speed):
             is_valid = False
-        if not validate_realistic_values(df, 'confidence',  min_confidence , max_confidence):
+        if not validate_realistic_values(df, 'flowSegmentData.confidence',  min_confidence , max_confidence):
             is_valid = False
     
     if is_valid:
