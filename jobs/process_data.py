@@ -56,7 +56,7 @@ def main():
         rate_date = rate["datetime"][:10]   #.split(" ")[0]      # e.g. "2025-05-21" without time and zone
         rate_value = rate["rate"]
     except requests.exceptions.RequestException as e:
-        logger.error("Can't Fetch Rate", exc_info=True)
+        logger.error(f"Can't Fetch Rate: {e}", exc_info=True)
         spark.stop()
         return
     
